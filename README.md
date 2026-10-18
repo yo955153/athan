@@ -85,6 +85,7 @@ playing the athan. That still confirms the schedule works.
 | `METHOD` | `2` | Aladhan method id. 2 is ISNA. |
 | `TZ` | `America/New_York` | |
 | `PRAYERS` | `Fajr,Dhuhr,Asr,Maghrib,Isha` | Remove any you don't want played |
+| `TUNE` | – | Minute adjustments per prayer, e.g. `Dhuhr=1,Asr=-2` |
 | `ALEXA_DEVICES` | – | Speaker name(s), comma-separated |
 | `ATHAN_URL` | – | Public HTTPS link to the converted MP3 |
 | `VOLUME` | – | 0–100. Sets the Echo's volume before playing; the Echo stays at that volume afterwards. |
@@ -104,5 +105,5 @@ playing the athan. That still confirms the schedule works.
   `data/alexa-cookie.json`, restart the app, and repeat step 3.
 - **Times look off.** Check the timings at
   `https://api.aladhan.com/v1/timings?latitude=40.7465&longitude=-74.1563&method=2`
-  and compare with your masjid's calendar. Aladhan also supports per-prayer
-  adjustments if you need them.
+  and compare with your masjid's calendar or prayer app, then use `TUNE` to
+  shift individual prayers by a few minutes.

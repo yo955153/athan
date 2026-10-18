@@ -22,6 +22,7 @@ const config = {
     method: env('METHOD', '2'),               // 2 = ISNA
     timezone: env('TZ', 'America/New_York'),
     prayers: list(env('PRAYERS', 'Fajr,Dhuhr,Asr,Maghrib,Isha')),
+    tune: env('TUNE', ''),                    // per-prayer minute offsets, e.g. "Dhuhr=1,Asr=-2"
     devices: list(env('ALEXA_DEVICES', '')),
     athanUrl: env('ATHAN_URL', ''),           // public HTTPS link to the converted MP3
     sourceAudioUrl: env('SOURCE_AUDIO_URL', 'https://praytimes.org/audio/sunni/Naghshbandi.mp3'),
@@ -207,6 +208,23 @@ function localDateParts(date) {
     return parts;
 }
 
+// Aladhan's "tune" parameter: minute offsets in this fixed order.
+const TUNE_ORDER = ['Imsak', 'Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Sunset', 'Isha', 'Midnight'];
+
+function tuneParam() {
+    const offsets = Object.fromEntries(TUNE_ORDER.map((name) => [name, 0]));
+    for (const entry of list(config.tune)) {
+        const [name, minutes] = entry.split('=').map((s) => s.trim());
+        const key = TUNE_ORDER.find((n) => n.toLowerCase() === (name || '').toLowerCase());
+        if (!key || !/^[+-]?\d+$/.test(minutes || '')) {
+            log(`Ignoring invalid TUNE entry "${entry}" (expected e.g. Dhuhr=1 or Asr=-2)`);
+            continue;
+        }
+        offsets[key] = Number(minutes);
+    }
+    return TUNE_ORDER.map((name) => offsets[name]).join(',');
+}
+
 async function fetchTimings(date) {
     const { day, month, year } = localDateParts(date);
     const params = new URLSearchParams({
@@ -216,6 +234,7 @@ async function fetchTimings(date) {
         timezonestring: config.timezone,
         iso8601: 'true',
     });
+    if (config.tune) params.set('tune', tuneParam());
     const url = `https://api.aladhan.com/v1/timings/${day}-${month}-${year}?${params}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
     const body = await res.json().catch(() => null);
@@ -297,6 +316,7 @@ function startStatusServer() {
             `Available:      ${alexaReady ? speakerNames().join(', ') : '-'}`,
             `Athan URL:      ${config.athanUrl || '(not set, Alexa will speak the prayer name instead)'}`,
             `Location:       ${config.latitude}, ${config.longitude}  method ${config.method}`,
+            `Adjustments:    ${config.tune || 'none'}`,
             '',
             "Today's schedule:",
             ...schedule.map((s) => `  ${s.prayer.padEnd(8)} ${timeFmt.format(s.at)}${s.at <= now ? '  (passed)' : ''}`),

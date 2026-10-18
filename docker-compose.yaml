@@ -18,6 +18,7 @@ services:
       LONGITUDE: "-74.1563"
       METHOD: "2"                  # ISNA
       PRAYERS: Fajr,Dhuhr,Asr,Maghrib,Isha
+      TUNE: Dhuhr=1,Asr=-2         # minute adjustments (matches the Pillars app)
       ALEXA_DEVICES: ""            # e.g. "Living Room Echo" (comma-separate for several)
       ATHAN_URL: ""                # public HTTPS link to athan-alexa.mp3 (see README)
       VOLUME: ""                   # optional 0-100; leave empty to keep the Echo's volume
