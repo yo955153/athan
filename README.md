@@ -1,2 +1,2 @@
 # athan
-Stores the mp3 for my atahn app
+Stores the mp3 for my athan app
