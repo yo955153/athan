@@ -1,0 +1,16 @@
+{
+  "name": "athan-alexa",
+  "version": "1.0.0",
+  "description": "Plays the athan on Amazon Alexa devices at daily prayer times (Aladhan API).",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "alexa-remote2": "8.1.1"
+  }
+}

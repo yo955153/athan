@@ -1,0 +1,32 @@
+# TrueNAS SCALE: Apps -> Discover Apps -> ⋮ -> Install via YAML, then paste this.
+services:
+  athan-alexa:
+    image: node:22-alpine
+    container_name: athan-alexa
+    restart: unless-stopped
+    working_dir: /app
+    command:
+      - sh
+      - -c
+      - >
+        apk add --no-cache ffmpeg tzdata > /dev/null &&
+        (test -d node_modules || npm install --omit=dev --no-audit --no-fund) &&
+        exec node src/index.js
+    environment:
+      TZ: America/New_York
+      LATITUDE: "40.7465"          # Harrison, NJ
+      LONGITUDE: "-74.1563"
+      METHOD: "2"                  # ISNA
+      PRAYERS: Fajr,Dhuhr,Asr,Maghrib,Isha
+      ALEXA_DEVICES: ""            # e.g. "Living Room Echo" (comma-separate for several)
+      ATHAN_URL: ""                # public HTTPS link to athan-alexa.mp3 (see README)
+      VOLUME: ""                   # optional 0-100; leave empty to keep the Echo's volume
+      MODE: speak                  # "announce" plays the announcement chime first
+      PROXY_IP: 192.168.1.200      # must match the address you open the login page with
+      PROXY_PORT: "3456"
+    ports:
+      - "3456:3456"                # one-time Amazon login
+      - "3457:3457"                # status page
+    volumes:
+      - /mnt/first_pool/Apps/athan-alexa:/app
+      - /mnt/first_pool/Apps/athan-alexa/data:/data
